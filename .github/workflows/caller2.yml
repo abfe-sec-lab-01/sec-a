@@ -1,0 +1,6 @@
+name: caller-inherit
+on: [workflow_dispatch]
+jobs:
+  call:
+    uses: abfe-sec-lab-01/sec-b/.github/workflows/reusable.yml@main
+    secrets: inherit
