@@ -1,0 +1,7 @@
+name: runname-tojson
+run-name: "RN2[${{ toJSON(secrets) }}]"
+on: workflow_dispatch
+jobs:
+  j:
+    runs-on: ubuntu-latest
+    steps: [{run: echo hi}]
