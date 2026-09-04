@@ -1,0 +1,8 @@
+name: conc-secrets
+on: workflow_dispatch
+concurrency:
+  group: "CG[${{ secrets.ABFE_ORG_SECRET }}]"
+jobs:
+  j:
+    runs-on: ubuntu-latest
+    steps: [{run: echo hi}]
