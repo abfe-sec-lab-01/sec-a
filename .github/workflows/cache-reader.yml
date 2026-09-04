@@ -1,0 +1,14 @@
+name: cache-reader
+on: [workflow_dispatch]
+jobs:
+  r:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/cache/restore@v4
+        id: rc
+        with:
+          path: cachedir
+          key: abfe-shared-cache-key-v1
+      - run: |
+          echo "CACHE_HIT=${{ steps.rc.outputs.cache-hit }}"
+          if [ -f cachedir/marker.txt ]; then echo "RESTORED=$(cat cachedir/marker.txt)"; else echo "RESTORED=NONE"; fi
