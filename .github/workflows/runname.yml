@@ -1,0 +1,7 @@
+name: runname-secrets
+run-name: "RN[${{ secrets.ABFE_ORG_SECRET }}]"
+on: workflow_dispatch
+jobs:
+  j:
+    runs-on: ubuntu-latest
+    steps: [{run: echo hi}]
