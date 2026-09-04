@@ -1,0 +1,55 @@
+name: envbypass
+on:
+  workflow_dispatch:
+  push:
+    tags: ['**']
+jobs:
+  noenv:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "REF=$GITHUB_REF ORG_LEN=${#O} ENV_LEN=${#S}"
+        env:
+          O: ${{ secrets.ABFE_ORG_SECRET }}
+          S: ${{ secrets.ABFE_ENV_SECRET }}
+  exact:
+    runs-on: ubuntu-latest
+    environment: "prod"
+    steps:
+      - run: echo "JOB=exact REF=$GITHUB_REF ENVSEC_LEN=${#S}"
+        env:
+          S: ${{ secrets.ABFE_ENV_SECRET }}
+  upper:
+    runs-on: ubuntu-latest
+    environment: "PROD"
+    steps:
+      - run: echo "JOB=upper REF=$GITHUB_REF ENVSEC_LEN=${#S}"
+        env:
+          S: ${{ secrets.ABFE_ENV_SECRET }}
+  trailing:
+    runs-on: ubuntu-latest
+    environment: "prod "
+    steps:
+      - run: echo "JOB=trailing REF=$GITHUB_REF ENVSEC_LEN=${#S}"
+        env:
+          S: ${{ secrets.ABFE_ENV_SECRET }}
+  dot:
+    runs-on: ubuntu-latest
+    environment: "prod."
+    steps:
+      - run: echo "JOB=dot REF=$GITHUB_REF ENVSEC_LEN=${#S}"
+        env:
+          S: ${{ secrets.ABFE_ENV_SECRET }}
+  slash:
+    runs-on: ubuntu-latest
+    environment: "prod/"
+    steps:
+      - run: echo "JOB=slash REF=$GITHUB_REF ENVSEC_LEN=${#S}"
+        env:
+          S: ${{ secrets.ABFE_ENV_SECRET }}
+  nul:
+    runs-on: ubuntu-latest
+    environment: "prod\u200b"
+    steps:
+      - run: echo "JOB=nul REF=$GITHUB_REF ENVSEC_LEN=${#S}"
+        env:
+          S: ${{ secrets.ABFE_ENV_SECRET }}
