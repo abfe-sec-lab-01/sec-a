@@ -1,0 +1,20 @@
+name: parser-probe
+on: workflow_dispatch
+jobs:
+  ymltag:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "T=[$T]"
+        env:
+          T: !!str yamlok
+  proto:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        __proto__: ["PP1"]
+        include:
+          - constructor: "PP2"
+    steps:
+      - run: |
+          echo "MATRIX=${{ toJSON(matrix) }}"
