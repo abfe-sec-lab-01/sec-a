@@ -1,0 +1,12 @@
+name: dependabot-secret-probe
+on: [workflow_dispatch]
+jobs:
+  p:
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          D: ${{ secrets.ABFE_DEPENDABOT_SECRET }}
+          O: ${{ secrets.ABFE_ORG_SECRET }}
+        run: |
+          echo "DEPENDABOT_SECRET_LENGTH=${#D}"
+          echo "ORG_SECRET_LENGTH=${#O}"
