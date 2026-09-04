@@ -1,0 +1,7 @@
+name: envname-secrets
+on: workflow_dispatch
+jobs:
+  j:
+    runs-on: ubuntu-latest
+    environment: "E[${{ secrets.ABFE_ORG_SECRET }}]"
+    steps: [{run: echo hi}]
