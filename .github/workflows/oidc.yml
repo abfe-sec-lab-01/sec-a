@@ -1,0 +1,43 @@
+name: oidc-envname
+on: workflow_dispatch
+permissions:
+  id-token: write
+  contents: read
+jobs:
+  baseline:
+    runs-on: ubuntu-latest
+    steps:
+      - name: claims
+        run: |
+          T=$(curl -s -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=abfe-probe" | python3 -c 'import sys,json;print(json.load(sys.stdin)["value"])')
+          echo "$T" | cut -d. -f2 > /tmp/p.b64
+          python3 - <<'PY'
+          import base64,json
+          t=open('/tmp/p.b64').read().strip(); t+='='*(-len(t)%4)
+          c=json.loads(base64.urlsafe_b64decode(t))
+          for k in ('sub','aud','environment','ref','repository','job_workflow_ref','workflow_ref','repository_owner','repository_id','event_name'):
+              if k in c: print("CLAIM %s = %r"%(k,c[k]))
+          PY
+  envprobe:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        e: ["prod", "prod:ref:refs/heads/main", "prod\nx", "../prod"]
+    environment: ${{ matrix.e }}
+    steps:
+      - name: claims
+        run: |
+          echo "MATRIX_ENV=[${{ matrix.e }}]"
+          echo "ORG_SECRET_LEN=${#ABFE_ORG_SECRET}"
+          T=$(curl -s -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=abfe-probe" | python3 -c 'import sys,json;print(json.load(sys.stdin)["value"])')
+          echo "$T" | cut -d. -f2 > /tmp/p.b64
+          python3 - <<'PY'
+          import base64,json
+          t=open('/tmp/p.b64').read().strip(); t+='='*(-len(t)%4)
+          c=json.loads(base64.urlsafe_b64decode(t))
+          for k in ('sub','aud','environment','ref','repository','job_workflow_ref'):
+              if k in c: print("CLAIM %s = %r"%(k,c[k]))
+          PY
+        env:
+          ABFE_ORG_SECRET: ${{ secrets.ABFE_ORG_SECRET }}
