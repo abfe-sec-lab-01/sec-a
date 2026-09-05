@@ -1,6 +1,8 @@
 name: oidc-control-publish
 on:
-  workflow_dispatch: {}
+  push:
+    paths:
+      - "oidc-trigger.txt"
 permissions:
   id-token: write
   contents: read
