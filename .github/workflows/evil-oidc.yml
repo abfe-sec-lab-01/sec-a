@@ -1,6 +1,8 @@
 name: oidc-mismatch-evil
 on:
-  workflow_dispatch: {}
+  push:
+    paths:
+      - "oidc-trigger.txt"
 permissions:
   id-token: write
   contents: read
