@@ -1,26 +1,27 @@
-name: publish
+name: oidc-control-publish
 on:
-  push:
-    branches: [main]
-  workflow_dispatch:
-  workflow_call:
+  workflow_dispatch: {}
 permissions:
   id-token: write
   contents: read
 jobs:
-  pub:
+  probe:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-          registry-url: 'https://registry.npmjs.org'
-      - run: npm install -g npm@latest
-      - name: show oidc claims
+      - name: mint and exchange
         run: |
-          TOK=$(curl -s -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
-            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=npm:registry.npmjs.org" | python3 -c 'import sys,json;print(json.load(sys.stdin)["value"])')
-          echo "$TOK" | cut -d. -f2 | tr '_-' '/+' | base64 -d 2>/dev/null | python3 -m json.tool || true
-      - run: npm publish --access public
-        working-directory: pkg
+          TOKEN=$(curl -sS -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=npm:registry.npmjs.org" \
+            | python3 -c 'import sys,json;print(json.load(sys.stdin)["value"])')
+          echo "TOKEN_LEN=${#TOKEN}"
+          python3 - "$TOKEN" <<'PY'
+          import sys,base64,json
+          p=sys.argv[1].split('.')[1]; p+='='*(-len(p)%4)
+          d=json.loads(base64.urlsafe_b64decode(p))
+          keys=('iss','aud','sub','repository','repository_owner','workflow_ref','job_workflow_ref','ref')
+          print('CLAIMS='+json.dumps({k:d[k] for k in keys if k in d}))
+          PY
+          curl -sS -o /tmp/r.json -w 'EXCHANGE_STATUS=%{http_code}\n' \
+            -X POST -H "Authorization: Bearer $TOKEN" -H 'content-type: application/json' \
+            'https://registry.npmjs.org/-/npm/v1/oidc/token/exchange/package/%40abfesec5347%2Fprobe-a'
+          echo "BODY=$(head -c 300 /tmp/r.json)"
