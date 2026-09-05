@@ -1,0 +1,7 @@
+{
+  "name": "@abfesec5347/probe-a",
+  "version": "1.0.2",
+  "description": "trusted publishing research probe",
+  "license": "MIT",
+  "main": "index.js"
+}
